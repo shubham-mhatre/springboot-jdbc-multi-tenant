@@ -1,11 +1,5 @@
 package com.sm.mt.utils;
 
-import java.sql.ConnectionBuilder;
-import java.sql.SQLException;
-import java.sql.ShardingKeyBuilder;
-
-import javax.sql.DataSource;
-
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
 public class DynamicDatasourceRouter extends AbstractRoutingDataSource {
@@ -24,25 +18,6 @@ public class DynamicDatasourceRouter extends AbstractRoutingDataSource {
 	protected Object determineCurrentLookupKey() {
 		return contextHolder.get();
 	}
-
-	@Override
-	public ConnectionBuilder createConnectionBuilder() throws SQLException {
-		// TODO Auto-generated method stub
-		return super.createConnectionBuilder();
-	}
-
-	@Override
-	public ShardingKeyBuilder createShardingKeyBuilder() throws SQLException {
-		// TODO Auto-generated method stub
-		return super.createShardingKeyBuilder();
-	}
-
-	@Override
-	protected DataSource determineTargetDataSource() {
-		// TODO Auto-generated method stub
-		return super.determineTargetDataSource();
-	}
-	
 	
 
 }

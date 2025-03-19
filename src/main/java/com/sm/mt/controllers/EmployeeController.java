@@ -2,6 +2,7 @@ package com.sm.mt.controllers;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +19,14 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class EmployeeController {
 	
-	private final EmployeeService employeeService;
+	private EmployeeService employeeService;
+	
+	@Autowired
+	public void setEmployeeService(EmployeeService employeeService) {
+		this.employeeService=employeeService;
+	}
+	
+	
 
 	@GetMapping("/employee/{id}")
 	public Employee getEmployeeById(@PathVariable int id) {

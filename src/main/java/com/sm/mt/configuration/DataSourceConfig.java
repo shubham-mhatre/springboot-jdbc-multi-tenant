@@ -1,46 +1,63 @@
 package com.sm.mt.configuration;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import com.sm.mt.entity.TenantMaster;
+import com.sm.mt.service.TenantService;
 import com.sm.mt.utils.DynamicDatasourceRouter;
 
 @Configuration
 public class DataSourceConfig {
 	
-	@Bean
+	private final ObjectProvider<TenantService> tenantServiceProvider;
+
+	
+	public DataSourceConfig(ObjectProvider<TenantService> tenantServiceProvider) {
+        this.tenantServiceProvider = tenantServiceProvider;
+    }
+	
+	@Bean(name = "masterDataSource")
+    public DataSource masterDataSource() {
+        DriverManagerDataSource masterDataSource = new DriverManagerDataSource();
+        masterDataSource.setUrl("jdbc:mysql://localhost:3306/master_db_tenant");
+        masterDataSource.setUsername("root");
+        masterDataSource.setPassword("root");
+        masterDataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        return masterDataSource;
+    }
+	
+	@Bean(name = "multiTenantDataSource")
 	public DataSource dataSource() {
 		DynamicDatasourceRouter router=new DynamicDatasourceRouter();
 		
-		DriverManagerDataSource masterDataSource=new DriverManagerDataSource();
-		masterDataSource.setUrl("jdbc:mysql://localhost:3306/master_db_tenant");
-		masterDataSource.setUsername("root");
-		masterDataSource.setPassword("root");
-		masterDataSource.setDriverClassName("com.mysql.jdbc.Driver");
+		DataSource  masterDataSource=masterDataSource();
 		
-		DriverManagerDataSource tenant1DataSource=new DriverManagerDataSource();
-		tenant1DataSource.setUrl("jdbc:mysql://localhost:3306/tenant_1");
-		tenant1DataSource.setUsername("root");
-		tenant1DataSource.setPassword("root");
-		tenant1DataSource.setDriverClassName("com.mysql.jdbc.Driver");
+		TenantService tenantService = tenantServiceProvider.getIfAvailable();
+        List<TenantMaster> tenants = tenantService != null ? tenantService.getAllTenants() : List.of();
+        
+        Map<Object,Object> dataSources=new HashMap<>();
+        for (TenantMaster tenant : tenants) {
+            DriverManagerDataSource tenantDataSource = new DriverManagerDataSource();
+            tenantDataSource.setUrl(tenant.getUrl());
+            tenantDataSource.setUsername(tenant.getUsername());
+            tenantDataSource.setPassword(tenant.getPassword());
+            tenantDataSource.setDriverClassName(tenant.getDriverClassName());
+            dataSources.put(tenant.getTenantId(), tenantDataSource);
+        }
 		
 		
-		DriverManagerDataSource tenant2DataSource=new DriverManagerDataSource();
-		tenant2DataSource.setUrl("jdbc:mysql://localhost:3306/tenant_2");
-		tenant2DataSource.setUsername("root");
-		tenant2DataSource.setPassword("root");
-		tenant2DataSource.setDriverClassName("com.mysql.jdbc.Driver");
-		
-		Map<Object,Object> dataSources=new HashMap<>();
 		dataSources.put("master", masterDataSource);
-		dataSources.put("tenant1", tenant1DataSource);
-		dataSources.put("tenant2", tenant2DataSource);
+		
+
 		
 		router.setDefaultTargetDataSource(masterDataSource);
 		router.setTargetDataSources(dataSources);

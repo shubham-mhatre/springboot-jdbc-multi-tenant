@@ -2,6 +2,9 @@ package com.sm.mt.repository;
 
 import java.util.List;
 
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -12,10 +15,10 @@ import com.sm.mt.entity.Employee;
 @Repository
 public class EmployeeRepositoryImpl implements EmployeeRepository {
 	
-	private final JdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 	
-	public EmployeeRepositoryImpl(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate=jdbcTemplate;
+	public EmployeeRepositoryImpl(@Qualifier("multiTenantDataSource") DataSource multiTenantDataSource) {
+		this.jdbcTemplate=new JdbcTemplate(multiTenantDataSource);
 	}
 
 	@Override
