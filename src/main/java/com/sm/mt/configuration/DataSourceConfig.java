@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import com.sm.mt.entity.TenantMaster;
@@ -25,7 +26,9 @@ public class DataSourceConfig {
         this.tenantServiceProvider = tenantServiceProvider;
     }
 	
-	@Bean(name = "masterDataSource")
+	//@Bean(name = "masterDataSource")
+	@Bean
+	@Primary
     public DataSource masterDataSource() {
         DriverManagerDataSource masterDataSource = new DriverManagerDataSource();
         masterDataSource.setUrl("jdbc:mysql://localhost:3306/master_db_tenant");

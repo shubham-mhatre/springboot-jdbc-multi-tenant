@@ -15,8 +15,8 @@ import com.sm.mt.entity.TenantMaster;
 public class TenantService {
 
 	private final JdbcTemplate jdbcTemplate;
-	
-	public TenantService(@Qualifier("masterDataSource") DataSource masterDataSource) {
+	//@Qualifier("masterDataSource") //instead of qualifier for masterDatasource, made masterDatasource as primary
+	public TenantService(DataSource masterDataSource) {
         this.jdbcTemplate = new JdbcTemplate(masterDataSource);
     }
 	
