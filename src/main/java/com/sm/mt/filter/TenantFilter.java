@@ -23,13 +23,15 @@ public class TenantFilter implements Filter{
         String tenantId = httpRequest.getHeader("X-Tenant-ID");
         
         if (tenantId != null) {
-            DynamicDatasourceRouter.setDataSourceKey(tenantId);
+            //DynamicDatasourceRouter.setDataSourceKey(tenantId);
+        	DynamicDatasourceRouter.setTenantId(tenantId);
         }
         
         try {
             chain.doFilter(request, response); // Continue processing request
         } finally {
-        	DynamicDatasourceRouter.clearDataSourceKey();
+        	//DynamicDatasourceRouter.clearDataSourceKey();
+        	DynamicDatasourceRouter.clearTenantId();
         }
 		
 	}
